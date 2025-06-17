@@ -196,17 +196,23 @@ const BillOfLadingForm = () => {
       setCurrentBOLId(bolId);
       setIsViewMode(viewOnly);
       
-      // Populate form data
+      // Populate form data with all required fields
       setFormData({
         bolNumber: data.bl_number || '',
         exportReference: '',
         forwardingAgent: '',
         shipperName: data.shipper_name || '',
         shipperAddress: data.shipper_address || '',
+        shipperCity: '',
+        shipperCountry: '',
         consigneeName: data.consignee_name || '',
         consigneeAddress: data.consignee_address || '',
+        consigneeCity: '',
+        consigneeCountry: '',
         notifyPartyName: data.notify_party_name || '',
         notifyPartyAddress: data.notify_party_address || '',
+        notifyPartyCity: '',
+        notifyPartyCountry: '',
         vesselName: data.vessel_name || '',
         voyageNumber: data.voyage_number || '',
         portOfLoading: data.port_of_loading || '',
@@ -223,9 +229,9 @@ const BillOfLadingForm = () => {
         termsAndConditions: 'Received the goods herein mentioned in apparent good order and condition unless otherwise noted, to be transported and delivered as mentioned above.',
       });
 
-      // Populate containers data
+      // Populate containers data with proper type handling
       if (data.containers && Array.isArray(data.containers)) {
-        setContainers(data.containers as ContainerInfo[]);
+        setContainers(data.containers as unknown as ContainerInfo[]);
       }
 
       toast({
