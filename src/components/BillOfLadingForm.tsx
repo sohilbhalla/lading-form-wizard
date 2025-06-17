@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Ship, FileText, Printer } from "lucide-react";
+import { Ship, FileText, Printer, Container, Plus, Minus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface CargoItem {
@@ -19,6 +19,14 @@ interface CargoItem {
   packageType: string;
   weight: string;
   measurement: string;
+}
+
+interface ContainerInfo {
+  id: string;
+  containerNumber: string;
+  containerType: string;
+  sealNumber: string;
+  cargoItems: CargoItem[];
 }
 
 const BillOfLadingForm = () => {
@@ -69,8 +77,16 @@ const BillOfLadingForm = () => {
     termsAndConditions: 'Received the goods herein mentioned in apparent good order and condition unless otherwise noted, to be transported and delivered as mentioned above.',
   });
 
-  const [cargoItems, setCargoItems] = useState<CargoItem[]>([
-    { id: '1', description: '', marks: '', packages: '', packageType: '', weight: '', measurement: '' }
+  const [containers, setContainers] = useState<ContainerInfo[]>([
+    {
+      id: '1',
+      containerNumber: '',
+      containerType: '',
+      sealNumber: '',
+      cargoItems: [
+        { id: '1', description: '', marks: '', packages: '', packageType: '', weight: '', measurement: '' }
+      ]
+    }
   ]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
@@ -80,29 +96,75 @@ const BillOfLadingForm = () => {
     }));
   };
 
-  const handleCargoChange = (id: string, field: string, value: string) => {
-    setCargoItems(prev => prev.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
+  const handleContainerChange = (containerId: string, field: string, value: string) => {
+    setContainers(prev => prev.map(container => 
+      container.id === containerId ? { ...container, [field]: value } : container
     ));
   };
 
-  const addCargoItem = () => {
-    const newId = (cargoItems.length + 1).toString();
-    setCargoItems(prev => [...prev, {
+  const handleCargoChange = (containerId: string, cargoId: string, field: string, value: string) => {
+    setContainers(prev => prev.map(container => 
+      container.id === containerId 
+        ? {
+            ...container,
+            cargoItems: container.cargoItems.map(item => 
+              item.id === cargoId ? { ...item, [field]: value } : item
+            )
+          }
+        : container
+    ));
+  };
+
+  const addContainer = () => {
+    const newId = (containers.length + 1).toString();
+    setContainers(prev => [...prev, {
       id: newId,
-      description: '',
-      marks: '',
-      packages: '',
-      packageType: '',
-      weight: '',
-      measurement: ''
+      containerNumber: '',
+      containerType: '',
+      sealNumber: '',
+      cargoItems: [
+        { id: '1', description: '', marks: '', packages: '', packageType: '', weight: '', measurement: '' }
+      ]
     }]);
   };
 
-  const removeCargoItem = (id: string) => {
-    if (cargoItems.length > 1) {
-      setCargoItems(prev => prev.filter(item => item.id !== id));
+  const removeContainer = (containerId: string) => {
+    if (containers.length > 1) {
+      setContainers(prev => prev.filter(container => container.id !== containerId));
     }
+  };
+
+  const addCargoItem = (containerId: string) => {
+    setContainers(prev => prev.map(container => {
+      if (container.id === containerId) {
+        const newCargoId = (container.cargoItems.length + 1).toString();
+        return {
+          ...container,
+          cargoItems: [...container.cargoItems, {
+            id: newCargoId,
+            description: '',
+            marks: '',
+            packages: '',
+            packageType: '',
+            weight: '',
+            measurement: ''
+          }]
+        };
+      }
+      return container;
+    }));
+  };
+
+  const removeCargoItem = (containerId: string, cargoId: string) => {
+    setContainers(prev => prev.map(container => {
+      if (container.id === containerId && container.cargoItems.length > 1) {
+        return {
+          ...container,
+          cargoItems: container.cargoItems.filter(item => item.id !== cargoId)
+        };
+      }
+      return container;
+    }));
   };
 
   const handleSave = () => {
@@ -180,7 +242,6 @@ const BillOfLadingForm = () => {
 
       {/* Parties Information */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Shipper */}
         <Card className="shadow-lg">
           <CardHeader className="bg-blue-50">
             <CardTitle className="text-blue-900">Shipper (Exporter)</CardTitle>
@@ -228,7 +289,6 @@ const BillOfLadingForm = () => {
           </CardContent>
         </Card>
 
-        {/* Consignee */}
         <Card className="shadow-lg">
           <CardHeader className="bg-blue-50">
             <CardTitle className="text-blue-900">Consignee (Importer)</CardTitle>
@@ -398,92 +458,183 @@ const BillOfLadingForm = () => {
         </CardContent>
       </Card>
 
-      {/* Cargo Details */}
+      {/* Updated Container & Cargo Details Section */}
       <Card className="shadow-lg">
         <CardHeader className="bg-blue-50">
-          <CardTitle className="text-blue-900">Cargo Details</CardTitle>
+          <CardTitle className="text-blue-900 flex items-center gap-2">
+            <Container className="h-5 w-5" />
+            Container & Cargo Details
+          </CardTitle>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="space-y-6">
-            {cargoItems.map((item, index) => (
-              <div key={item.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <div className="flex justify-between items-center mb-4">
-                  <h4 className="font-semibold text-blue-900">Cargo Item #{index + 1}</h4>
-                  {cargoItems.length > 1 && (
+          <div className="space-y-8">
+            {containers.map((container, containerIndex) => (
+              <div key={container.id} className="border-2 border-blue-200 rounded-lg p-6 bg-blue-50/30">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-bold text-blue-900 flex items-center gap-2">
+                    <Container className="h-5 w-5" />
+                    Container #{containerIndex + 1}
+                  </h3>
+                  {containers.length > 1 && (
                     <Button
-                      onClick={() => removeCargoItem(item.id)}
+                      onClick={() => removeContainer(container.id)}
                       variant="destructive"
                       size="sm"
                     >
-                      Remove
+                      <Minus className="h-4 w-4 mr-1" />
+                      Remove Container
                     </Button>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div className="md:col-span-2 lg:col-span-1">
-                    <Label className="font-semibold">Description of Goods *</Label>
-                    <Textarea
-                      value={item.description}
-                      onChange={(e) => handleCargoChange(item.id, 'description', e.target.value)}
-                      placeholder="Detailed description of goods"
-                      rows={3}
-                    />
-                  </div>
+                
+                {/* Container Information */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 bg-white rounded-lg border">
                   <div>
-                    <Label className="font-semibold">Marks & Numbers</Label>
-                    <Textarea
-                      value={item.marks}
-                      onChange={(e) => handleCargoChange(item.id, 'marks', e.target.value)}
-                      placeholder="Container/Package marks"
-                      rows={3}
-                    />
-                  </div>
-                  <div>
-                    <Label className="font-semibold">No. of Packages</Label>
+                    <Label className="font-semibold">Container Number *</Label>
                     <Input
-                      value={item.packages}
-                      onChange={(e) => handleCargoChange(item.id, 'packages', e.target.value)}
-                      placeholder="100"
+                      value={container.containerNumber}
+                      onChange={(e) => handleContainerChange(container.id, 'containerNumber', e.target.value)}
+                      placeholder="TEMU1234567"
+                      className="font-mono"
                     />
                   </div>
                   <div>
-                    <Label className="font-semibold">Package Type</Label>
-                    <Select value={item.packageType} onValueChange={(value) => handleCargoChange(item.id, 'packageType', value)}>
+                    <Label className="font-semibold">Container Type</Label>
+                    <Select 
+                      value={container.containerType} 
+                      onValueChange={(value) => handleContainerChange(container.id, 'containerType', value)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select type" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="boxes">Boxes</SelectItem>
-                        <SelectItem value="pallets">Pallets</SelectItem>
-                        <SelectItem value="containers">Containers</SelectItem>
-                        <SelectItem value="bags">Bags</SelectItem>
-                        <SelectItem value="drums">Drums</SelectItem>
-                        <SelectItem value="cases">Cases</SelectItem>
-                        <SelectItem value="pieces">Pieces</SelectItem>
+                        <SelectItem value="20DC">20' Dry Container</SelectItem>
+                        <SelectItem value="40DC">40' Dry Container</SelectItem>
+                        <SelectItem value="40HC">40' High Cube</SelectItem>
+                        <SelectItem value="20RF">20' Reefer</SelectItem>
+                        <SelectItem value="40RF">40' Reefer</SelectItem>
+                        <SelectItem value="20OT">20' Open Top</SelectItem>
+                        <SelectItem value="40OT">40' Open Top</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label className="font-semibold">Gross Weight (kg)</Label>
+                    <Label className="font-semibold">Seal Number</Label>
                     <Input
-                      value={item.weight}
-                      onChange={(e) => handleCargoChange(item.id, 'weight', e.target.value)}
-                      placeholder="1000"
-                    />
-                  </div>
-                  <div>
-                    <Label className="font-semibold">Measurement (CBM)</Label>
-                    <Input
-                      value={item.measurement}
-                      onChange={(e) => handleCargoChange(item.id, 'measurement', e.target.value)}
-                      placeholder="10.5"
+                      value={container.sealNumber}
+                      onChange={(e) => handleContainerChange(container.id, 'sealNumber', e.target.value)}
+                      placeholder="SL123456"
+                      className="font-mono"
                     />
                   </div>
                 </div>
+
+                {/* Cargo Items for this Container */}
+                <div className="space-y-4">
+                  <h4 className="font-semibold text-blue-800 flex items-center gap-2">
+                    <FileText className="h-4 w-4" />
+                    Cargo Items in Container #{containerIndex + 1}
+                  </h4>
+                  
+                  {container.cargoItems.map((item, itemIndex) => (
+                    <div key={item.id} className="border border-gray-200 rounded-lg p-4 bg-white">
+                      <div className="flex justify-between items-center mb-4">
+                        <h5 className="font-medium text-gray-700">Product Line #{itemIndex + 1}</h5>
+                        {container.cargoItems.length > 1 && (
+                          <Button
+                            onClick={() => removeCargoItem(container.id, item.id)}
+                            variant="outline"
+                            size="sm"
+                            className="text-red-600 hover:text-red-700"
+                          >
+                            <Minus className="h-3 w-3 mr-1" />
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="md:col-span-2 lg:col-span-1">
+                          <Label className="font-semibold">Description of Goods *</Label>
+                          <Textarea
+                            value={item.description}
+                            onChange={(e) => handleCargoChange(container.id, item.id, 'description', e.target.value)}
+                            placeholder="Detailed description of goods"
+                            rows={3}
+                          />
+                        </div>
+                        <div>
+                          <Label className="font-semibold">Marks & Numbers</Label>
+                          <Textarea
+                            value={item.marks}
+                            onChange={(e) => handleCargoChange(container.id, item.id, 'marks', e.target.value)}
+                            placeholder="Package marks"
+                            rows={3}
+                          />
+                        </div>
+                        <div>
+                          <Label className="font-semibold">No. of Packages</Label>
+                          <Input
+                            value={item.packages}
+                            onChange={(e) => handleCargoChange(container.id, item.id, 'packages', e.target.value)}
+                            placeholder="100"
+                          />
+                        </div>
+                        <div>
+                          <Label className="font-semibold">Package Type</Label>
+                          <Select 
+                            value={item.packageType} 
+                            onValueChange={(value) => handleCargoChange(container.id, item.id, 'packageType', value)}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="boxes">Boxes</SelectItem>
+                              <SelectItem value="pallets">Pallets</SelectItem>
+                              <SelectItem value="bags">Bags</SelectItem>
+                              <SelectItem value="drums">Drums</SelectItem>
+                              <SelectItem value="cases">Cases</SelectItem>
+                              <SelectItem value="pieces">Pieces</SelectItem>
+                              <SelectItem value="cartons">Cartons</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label className="font-semibold">Gross Weight (kg)</Label>
+                          <Input
+                            value={item.weight}
+                            onChange={(e) => handleCargoChange(container.id, item.id, 'weight', e.target.value)}
+                            placeholder="1000"
+                          />
+                        </div>
+                        <div>
+                          <Label className="font-semibold">Measurement (CBM)</Label>
+                          <Input
+                            value={item.measurement}
+                            onChange={(e) => handleCargoChange(container.id, item.id, 'measurement', e.target.value)}
+                            placeholder="10.5"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  <Button 
+                    onClick={() => addCargoItem(container.id)} 
+                    variant="outline" 
+                    className="w-full border-green-600 text-green-600 hover:bg-green-50"
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Product Line to Container #{containerIndex + 1}
+                  </Button>
+                </div>
               </div>
             ))}
-            <Button onClick={addCargoItem} variant="outline" className="w-full border-blue-900 text-blue-900 hover:bg-blue-50">
-              Add Another Cargo Item
+            
+            <Button onClick={addContainer} className="w-full bg-blue-900 hover:bg-blue-800">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Another Container
             </Button>
           </div>
         </CardContent>
