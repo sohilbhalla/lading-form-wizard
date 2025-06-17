@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -99,5 +100,41 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Print styles for Bill of Lading */
+@media print {
+  body {
+    background: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Ensure proper page breaks */
+  .page-break {
+    page-break-before: always;
+  }
+  
+  /* Make sure gradients print properly */
+  .bg-gradient-to-r {
+    background: #1e3a8a !important;
+    color: white !important;
+  }
+  
+  /* Adjust margins for print */
+  .max-w-6xl {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0.5rem !important;
+  }
+  
+  /* Ensure cards are visible when printed */
+  .shadow-lg {
+    border: 1px solid #e5e7eb !important;
   }
 }
