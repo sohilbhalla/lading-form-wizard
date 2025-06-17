@@ -7,11 +7,12 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
-import { Ship, FileText, Printer, Container, Plus, Minus, Save, Edit, Trash2, Eye } from "lucide-react";
+import { Ship, FileText, Printer, Container, Plus, Minus, Save, Edit, Trash2, Eye, Download } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import UserNav from './UserNav';
+import { generateBOLPDF } from '@/utils/pdfExport';
 
 // Location data
 const MAJOR_PORTS = [
@@ -476,6 +477,23 @@ const BillOfLadingForm = () => {
     window.print();
   };
 
+  const handlePDFExport = async () => {
+    try {
+      await generateBOLPDF(formData, containers);
+      toast({
+        title: "PDF Generated",
+        description: "Your Bill of Lading PDF has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "PDF Generation Failed",
+        description: "There was an error generating the PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6 bg-gray-50 min-h-screen">
       {/* Header */}
@@ -563,6 +581,10 @@ const BillOfLadingForm = () => {
               {currentBOLId ? 'Update BOL' : 'Save BOL'}
             </Button>
           )}
+          <Button onClick={handlePDFExport} variant="outline" className="border-green-600 text-green-600 hover:bg-green-50">
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
           <Button onClick={handlePrint} variant="outline" className="border-blue-900 text-blue-900 hover:bg-blue-50">
             <Printer className="h-4 w-4 mr-2" />
             Print
