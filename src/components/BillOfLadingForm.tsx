@@ -13,6 +13,43 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import UserNav from './UserNav';
 
+// Location data
+const MAJOR_PORTS = [
+  'Shanghai, China', 'Singapore', 'Ningbo-Zhoushan, China', 'Shenzhen, China', 'Guangzhou, China',
+  'Busan, South Korea', 'Hong Kong', 'Qingdao, China', 'Tianjin, China', 'Rotterdam, Netherlands',
+  'Dubai, UAE', 'Port Klang, Malaysia', 'Antwerp, Belgium', 'Xiamen, China', 'Kaohsiung, Taiwan',
+  'Los Angeles, USA', 'Hamburg, Germany', 'Tanjung Pelepas, Malaysia', 'Long Beach, USA',
+  'New York/New Jersey, USA', 'Laem Chabang, Thailand', 'Bremen/Bremerhaven, Germany',
+  'Felixstowe, UK', 'Colombo, Sri Lanka', 'Jebel Ali, UAE', 'Valencia, Spain', 'Piraeus, Greece',
+  'Jawaharlal Nehru, India', 'Algeciras, Spain', 'Savannah, USA', 'Barcelona, Spain',
+  'Le Havre, France', 'Tokyo, Japan', 'Norfolk, USA', 'Yokohama, Japan', 'Charleston, USA'
+];
+
+const COUNTRIES = [
+  'Afghanistan', 'Albania', 'Algeria', 'Argentina', 'Armenia', 'Australia', 'Austria', 'Azerbaijan',
+  'Bahrain', 'Bangladesh', 'Belarus', 'Belgium', 'Bolivia', 'Bosnia and Herzegovina', 'Brazil',
+  'Bulgaria', 'Cambodia', 'Canada', 'Chile', 'China', 'Colombia', 'Croatia', 'Czech Republic',
+  'Denmark', 'Ecuador', 'Egypt', 'Estonia', 'Finland', 'France', 'Georgia', 'Germany', 'Ghana',
+  'Greece', 'Hong Kong', 'Hungary', 'Iceland', 'India', 'Indonesia', 'Iran', 'Iraq', 'Ireland',
+  'Israel', 'Italy', 'Japan', 'Jordan', 'Kazakhstan', 'Kenya', 'Kuwait', 'Latvia', 'Lebanon',
+  'Lithuania', 'Luxembourg', 'Malaysia', 'Mexico', 'Morocco', 'Netherlands', 'New Zealand',
+  'Nigeria', 'Norway', 'Pakistan', 'Peru', 'Philippines', 'Poland', 'Portugal', 'Qatar',
+  'Romania', 'Russia', 'Saudi Arabia', 'Singapore', 'Slovakia', 'Slovenia', 'South Africa',
+  'South Korea', 'Spain', 'Sri Lanka', 'Sweden', 'Switzerland', 'Taiwan', 'Thailand', 'Turkey',
+  'Ukraine', 'United Arab Emirates', 'United Kingdom', 'United States', 'Uruguay', 'Venezuela',
+  'Vietnam'
+];
+
+const MAJOR_CITIES = [
+  'Amsterdam', 'Antwerp', 'Barcelona', 'Beijing', 'Berlin', 'Boston', 'Bremen', 'Brussels',
+  'Buenos Aires', 'Cairo', 'Chennai', 'Chicago', 'Colombo', 'Copenhagen', 'Delhi', 'Dubai',
+  'Frankfurt', 'Geneva', 'Hamburg', 'Hong Kong', 'Houston', 'Istanbul', 'Jakarta', 'Karachi',
+  'Kuala Lumpur', 'London', 'Los Angeles', 'Madrid', 'Manila', 'Melbourne', 'Mexico City',
+  'Miami', 'Milan', 'Montreal', 'Moscow', 'Mumbai', 'New York', 'Oslo', 'Paris', 'Rio de Janeiro',
+  'Rome', 'São Paulo', 'Seoul', 'Shanghai', 'Singapore', 'Stockholm', 'Sydney', 'Tokyo',
+  'Toronto', 'Vancouver', 'Vienna', 'Warsaw', 'Zurich'
+];
+
 interface CargoItem {
   id: string;
   description: string;
@@ -606,23 +643,37 @@ const BillOfLadingForm = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="shipperCity" className="font-semibold">City</Label>
-                <Input
-                  id="shipperCity"
-                  value={formData.shipperCity}
-                  onChange={(e) => handleInputChange('shipperCity', e.target.value)}
-                  placeholder="City"
+                <Select 
+                  value={formData.shipperCity} 
+                  onValueChange={(value) => handleInputChange('shipperCity', value)}
                   disabled={isViewMode}
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select city" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    {MAJOR_CITIES.map((city) => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="shipperCountry" className="font-semibold">Country</Label>
-                <Input
-                  id="shipperCountry"
-                  value={formData.shipperCountry}
-                  onChange={(e) => handleInputChange('shipperCountry', e.target.value)}
-                  placeholder="Country"
+                <Select 
+                  value={formData.shipperCountry} 
+                  onValueChange={(value) => handleInputChange('shipperCountry', value)}
                   disabled={isViewMode}
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    {COUNTRIES.map((country) => (
+                      <SelectItem key={country} value={country}>{country}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>
@@ -657,23 +708,37 @@ const BillOfLadingForm = () => {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="consigneeCity" className="font-semibold">City</Label>
-                <Input
-                  id="consigneeCity"
-                  value={formData.consigneeCity}
-                  onChange={(e) => handleInputChange('consigneeCity', e.target.value)}
-                  placeholder="City"
+                <Select 
+                  value={formData.consigneeCity} 
+                  onValueChange={(value) => handleInputChange('consigneeCity', value)}
                   disabled={isViewMode}
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select city" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    {MAJOR_CITIES.map((city) => (
+                      <SelectItem key={city} value={city}>{city}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <Label htmlFor="consigneeCountry" className="font-semibold">Country</Label>
-                <Input
-                  id="consigneeCountry"
-                  value={formData.consigneeCountry}
-                  onChange={(e) => handleInputChange('consigneeCountry', e.target.value)}
-                  placeholder="Country"
+                <Select 
+                  value={formData.consigneeCountry} 
+                  onValueChange={(value) => handleInputChange('consigneeCountry', value)}
                   disabled={isViewMode}
-                />
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select country" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white z-50">
+                    {COUNTRIES.map((country) => (
+                      <SelectItem key={country} value={country}>{country}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </CardContent>
@@ -709,23 +774,37 @@ const BillOfLadingForm = () => {
             </div>
             <div>
               <Label htmlFor="notifyPartyCity" className="font-semibold">City</Label>
-              <Input
-                id="notifyPartyCity"
-                value={formData.notifyPartyCity}
-                onChange={(e) => handleInputChange('notifyPartyCity', e.target.value)}
-                placeholder="City"
+              <Select 
+                value={formData.notifyPartyCity} 
+                onValueChange={(value) => handleInputChange('notifyPartyCity', value)}
                 disabled={isViewMode}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select city" />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  {MAJOR_CITIES.map((city) => (
+                    <SelectItem key={city} value={city}>{city}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="notifyPartyCountry" className="font-semibold">Country</Label>
-              <Input
-                id="notifyPartyCountry"
-                value={formData.notifyPartyCountry}
-                onChange={(e) => handleInputChange('notifyPartyCountry', e.target.value)}
-                placeholder="Country"
+              <Select 
+                value={formData.notifyPartyCountry} 
+                onValueChange={(value) => handleInputChange('notifyPartyCountry', value)}
                 disabled={isViewMode}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  {COUNTRIES.map((country) => (
+                    <SelectItem key={country} value={country}>{country}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
@@ -770,49 +849,77 @@ const BillOfLadingForm = () => {
             </div>
             <div>
               <Label htmlFor="portOfLoading" className="font-semibold">Port of Loading *</Label>
-              <Input
-                id="portOfLoading"
-                value={formData.portOfLoading}
-                onChange={(e) => handleInputChange('portOfLoading', e.target.value)}
-                placeholder="Port of Loading"
+              <Select 
+                value={formData.portOfLoading} 
+                onValueChange={(value) => handleInputChange('portOfLoading', value)}
                 disabled={isViewMode}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select port" />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  {MAJOR_PORTS.map((port) => (
+                    <SelectItem key={port} value={port}>{port}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="portOfDischarge" className="font-semibold">Port of Discharge *</Label>
-              <Input
-                id="portOfDischarge"
-                value={formData.portOfDischarge}
-                onChange={(e) => handleInputChange('portOfDischarge', e.target.value)}
-                placeholder="Port of Discharge"
+              <Select 
+                value={formData.portOfDischarge} 
+                onValueChange={(value) => handleInputChange('portOfDischarge', value)}
                 disabled={isViewMode}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select port" />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  {MAJOR_PORTS.map((port) => (
+                    <SelectItem key={port} value={port}>{port}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="placeOfReceipt" className="font-semibold">Place of Receipt</Label>
-              <Input
-                id="placeOfReceipt"
-                value={formData.placeOfReceipt}
-                onChange={(e) => handleInputChange('placeOfReceipt', e.target.value)}
-                placeholder="Place of Receipt"
+              <Select 
+                value={formData.placeOfReceipt} 
+                onValueChange={(value) => handleInputChange('placeOfReceipt', value)}
                 disabled={isViewMode}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  {MAJOR_CITIES.map((city) => (
+                    <SelectItem key={city} value={city}>{city}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="md:col-span-2">
               <Label htmlFor="placeOfDelivery" className="font-semibold">Place of Delivery</Label>
-              <Input
-                id="placeOfDelivery"
-                value={formData.placeOfDelivery}
-                onChange={(e) => handleInputChange('placeOfDelivery', e.target.value)}
-                placeholder="Place of Delivery"
+              <Select 
+                value={formData.placeOfDelivery} 
+                onValueChange={(value) => handleInputChange('placeOfDelivery', value)}
                 disabled={isViewMode}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select location" />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  {MAJOR_CITIES.map((city) => (
+                    <SelectItem key={city} value={city}>{city}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Updated Container & Cargo Details Section */}
+      {/* Container & Cargo Details Section */}
       <Card className="shadow-lg">
         <CardHeader className="bg-blue-50">
           <CardTitle className="text-blue-900 flex items-center gap-2">
@@ -1016,13 +1123,20 @@ const BillOfLadingForm = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div>
               <Label htmlFor="freightPayableAt" className="font-semibold">Freight Payable At</Label>
-              <Input
-                id="freightPayableAt"
-                value={formData.freightPayableAt}
-                onChange={(e) => handleInputChange('freightPayableAt', e.target.value)}
-                placeholder="Destination Port"
+              <Select 
+                value={formData.freightPayableAt} 
+                onValueChange={(value) => handleInputChange('freightPayableAt', value)}
                 disabled={isViewMode}
-              />
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select port" />
+                </SelectTrigger>
+                <SelectContent className="bg-white z-50">
+                  {MAJOR_PORTS.map((port) => (
+                    <SelectItem key={port} value={port}>{port}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label htmlFor="freightCharges" className="font-semibold">Freight Charges</Label>
@@ -1054,7 +1168,7 @@ const BillOfLadingForm = () => {
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white z-50">
                   <SelectItem value="1">1</SelectItem>
                   <SelectItem value="2">2</SelectItem>
                   <SelectItem value="3">3</SelectItem>
