@@ -1,11 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import BillOfLadingForm from '@/components/BillOfLadingForm';
+import CMRForm from '@/components/CMRForm';
+import DocumentTypeSelector from '@/components/DocumentTypeSelector';
 import AuthPage from '@/components/AuthPage';
 
 const Index = () => {
   const { user, loading } = useAuth();
+  const [documentType, setDocumentType] = useState<'BOL' | 'CMR'>('BOL');
 
   if (loading) {
     return (
@@ -22,7 +25,18 @@ const Index = () => {
     return <AuthPage />;
   }
 
-  return <BillOfLadingForm />;
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4">
+      <div className="max-w-6xl mx-auto">
+        <DocumentTypeSelector 
+          selectedType={documentType} 
+          onTypeChange={setDocumentType} 
+        />
+        
+        {documentType === 'BOL' ? <BillOfLadingForm /> : <CMRForm />}
+      </div>
+    </div>
+  );
 };
 
 export default Index;
