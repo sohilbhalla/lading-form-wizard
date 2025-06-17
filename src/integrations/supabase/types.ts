@@ -9,7 +9,102 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      bill_of_ladings: {
+        Row: {
+          bl_number: string
+          consignee_address: string | null
+          consignee_name: string | null
+          containers: Json | null
+          created_at: string | null
+          freight_charges: string | null
+          id: string
+          notify_party_address: string | null
+          notify_party_name: string | null
+          payment_terms: string | null
+          place_of_delivery: string | null
+          place_of_receipt: string | null
+          port_of_discharge: string | null
+          port_of_loading: string | null
+          shipper_address: string | null
+          shipper_name: string | null
+          updated_at: string | null
+          user_id: string
+          vessel_name: string | null
+          voyage_number: string | null
+        }
+        Insert: {
+          bl_number: string
+          consignee_address?: string | null
+          consignee_name?: string | null
+          containers?: Json | null
+          created_at?: string | null
+          freight_charges?: string | null
+          id?: string
+          notify_party_address?: string | null
+          notify_party_name?: string | null
+          payment_terms?: string | null
+          place_of_delivery?: string | null
+          place_of_receipt?: string | null
+          port_of_discharge?: string | null
+          port_of_loading?: string | null
+          shipper_address?: string | null
+          shipper_name?: string | null
+          updated_at?: string | null
+          user_id: string
+          vessel_name?: string | null
+          voyage_number?: string | null
+        }
+        Update: {
+          bl_number?: string
+          consignee_address?: string | null
+          consignee_name?: string | null
+          containers?: Json | null
+          created_at?: string | null
+          freight_charges?: string | null
+          id?: string
+          notify_party_address?: string | null
+          notify_party_name?: string | null
+          payment_terms?: string | null
+          place_of_delivery?: string | null
+          place_of_receipt?: string | null
+          port_of_discharge?: string | null
+          port_of_loading?: string | null
+          shipper_address?: string | null
+          shipper_name?: string | null
+          updated_at?: string | null
+          user_id?: string
+          vessel_name?: string | null
+          voyage_number?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          company_name: string | null
+          created_at: string | null
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          company_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string | null
+        }
+        Update: {
+          company_name?: string | null
+          created_at?: string | null
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

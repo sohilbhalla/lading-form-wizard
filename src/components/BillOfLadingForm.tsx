@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +9,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { Ship, FileText, Printer, Container, Plus, Minus } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/contexts/AuthContext';
+import UserNav from './UserNav';
 
 interface CargoItem {
   id: string;
@@ -30,6 +32,8 @@ interface ContainerInfo {
 }
 
 const BillOfLadingForm = () => {
+  const { user } = useAuth();
+  
   const [formData, setFormData] = useState({
     // Header Information
     bolNumber: '',
@@ -167,11 +171,57 @@ const BillOfLadingForm = () => {
     }));
   };
 
-  const handleSave = () => {
-    toast({
-      title: "Bill of Lading Saved",
-      description: "Your Bill of Lading has been saved successfully.",
-    });
+  const handleSave = async () => {
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to save your Bill of Lading.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const bolData = {
+        user_id: user.id,
+        bl_number: formData.bolNumber,
+        shipper_name: formData.shipperName,
+        shipper_address: formData.shipperAddress,
+        consignee_name: formData.consigneeName,
+        consignee_address: formData.consigneeAddress,
+        notify_party_name: formData.notifyPartyName,
+        notify_party_address: formData.notifyPartyAddress,
+        port_of_loading: formData.portOfLoading,
+        port_of_discharge: formData.portOfDischarge,
+        place_of_receipt: formData.placeOfReceipt,
+        place_of_delivery: formData.placeOfDelivery,
+        vessel_name: formData.vesselName,
+        voyage_number: formData.voyageNumber,
+        freight_charges: formData.freightCharges,
+        payment_terms: formData.prepaid ? 'Prepaid' : formData.collect ? 'Collect' : '',
+        containers: containers,
+      };
+
+      const { error } = await supabase
+        .from('bill_of_ladings')
+        .insert([bolData]);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Bill of Lading Saved",
+        description: "Your Bill of Lading has been saved successfully to your account.",
+      });
+    } catch (error) {
+      console.error('Error saving BOL:', error);
+      toast({
+        title: "Save Failed",
+        description: "There was an error saving your Bill of Lading. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handlePrint = () => {
@@ -182,12 +232,15 @@ const BillOfLadingForm = () => {
     <div className="max-w-6xl mx-auto p-6 space-y-6 bg-gray-50 min-h-screen">
       {/* Header */}
       <div className="text-center bg-gradient-to-r from-blue-900 to-blue-700 text-white py-8 rounded-lg shadow-lg">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <Ship className="h-8 w-8" />
-          <h1 className="text-3xl font-bold">BILL OF LADING</h1>
-          <FileText className="h-8 w-8" />
+        <div className="flex items-center justify-between px-6">
+          <div className="flex items-center gap-3">
+            <Ship className="h-8 w-8" />
+            <h1 className="text-3xl font-bold">BILL OF LADING</h1>
+            <FileText className="h-8 w-8" />
+          </div>
+          <UserNav />
         </div>
-        <p className="text-blue-100">Ocean Bill of Lading - Non-Negotiable</p>
+        <p className="text-blue-100 mt-2">Ocean Bill of Lading - Non-Negotiable</p>
       </div>
 
       {/* Action Buttons */}
