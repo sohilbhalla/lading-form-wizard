@@ -13,6 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import UserNav from './UserNav';
 import { generateBOLPDF } from '@/utils/pdfExport';
+import { downloadBOLXML } from '@/utils/xmlExport';
 
 // Location data
 const MAJOR_PORTS = [
@@ -489,6 +490,58 @@ const BillOfLadingForm = () => {
       toast({
         title: "PDF Generation Failed",
         description: "There was an error generating the PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportPDF = () => {
+    if (!formData.bolNumber.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a B/L Number before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      generateBOLPDF(formData, containers);
+      toast({
+        title: "Success",
+        description: "PDF file downloaded successfully!",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF file. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleExportXML = () => {
+    if (!formData.bolNumber.trim()) {
+      toast({
+        title: "Error",
+        description: "Please enter a B/L Number before exporting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      downloadBOLXML(formData, containers);
+      toast({
+        title: "Success",
+        description: "XML file downloaded successfully!",
+      });
+    } catch (error) {
+      console.error('Error generating XML:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate XML file. Please try again.",
         variant: "destructive",
       });
     }
